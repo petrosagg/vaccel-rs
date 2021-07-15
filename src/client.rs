@@ -6,7 +6,7 @@ use tarpc::server::{BaseChannel, Channel};
 use tarpc::transport::channel;
 
 use crate::resource::{Resource, ResourceRef};
-use crate::session::{VaccelClient, VaccelHandler, Vaccel};
+use crate::server::{VaccelClient, Handler, Vaccel};
 
 pub enum ClientConfig {
     /// All RPC calls will be performed over an in-memory mpsc channel
@@ -25,7 +25,7 @@ impl Client {
             ClientConfig::Local => {
                 let (client_transport, server_transport) = channel::unbounded();
                 let server = BaseChannel::with_defaults(server_transport);
-                tokio::spawn(server.execute(VaccelHandler::default().serve()));
+                tokio::spawn(server.execute(Handler::default().serve()));
 
                 Self {
                     inner: VaccelClient::new(client::Config::default(), client_transport).spawn(),

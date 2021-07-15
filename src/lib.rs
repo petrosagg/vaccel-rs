@@ -1,3 +1,3 @@
 pub mod client;
 pub mod resource;
-pub mod session;
+pub mod server;
