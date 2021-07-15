@@ -1,7 +1,7 @@
 use std::convert::TryFrom;
 use std::marker::PhantomData;
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum Resource {

@@ -1,9 +1,9 @@
 use std::convert::TryInto;
-use std::sync::Arc;
 use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::Arc;
 
-use futures::future::{self, Ready};
 use dashmap::DashMap;
+use futures::future::{self, Ready};
 use tarpc::context::Context;
 
 use crate::resource::{Resource, ResourceRef};
@@ -34,7 +34,10 @@ impl Handler {
     /// they can use. Since resources can be used concurrently by many requests only shared
     /// references are even given
     pub fn get_resource<T>(&self, resource: &ResourceRef<T>) -> Option<Arc<Resource>> {
-        self.0.resources.get(&resource.id).map(|r| Arc::clone(r.value()))
+        self.0
+            .resources
+            .get(&resource.id)
+            .map(|r| Arc::clone(r.value()))
     }
 }
 

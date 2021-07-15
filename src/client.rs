@@ -6,7 +6,7 @@ use tarpc::server::{BaseChannel, Channel};
 use tarpc::transport::channel;
 
 use crate::resource::{Resource, ResourceRef};
-use crate::server::{VaccelClient, Handler, Vaccel};
+use crate::server::{Handler, Vaccel, VaccelClient};
 
 pub enum ClientConfig {
     /// All RPC calls will be performed over an in-memory mpsc channel
@@ -38,8 +38,15 @@ impl Client {
     }
 
     pub async fn register<T: Into<Resource>>(&self, data: T) -> ResourceRef<T> {
-        let id = self.inner.register_resource(context::current(), data.into()).await.unwrap();
-        ResourceRef { id, marker: PhantomData }
+        let id = self
+            .inner
+            .register_resource(context::current(), data.into())
+            .await
+            .unwrap();
+        ResourceRef {
+            id,
+            marker: PhantomData,
+        }
     }
 
     pub async fn length(&self, model: ResourceRef<String>) -> usize {
