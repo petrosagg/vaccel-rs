@@ -11,3 +11,4 @@ tarpc = { version = "0.26.2", features = [ "tokio1", "serde1" ] }
 futures = "0.3"
 tokio = { version = "1", features = [ "full" ] }
 serde = "1"
+dashmap = "4"
