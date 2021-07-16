@@ -3,7 +3,6 @@ use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::Arc;
 
 use dashmap::DashMap;
-use futures::future::{self, Ready};
 use tarpc::context::Context;
 
 use crate::resource::{Resource, ResourceRef};
@@ -41,22 +40,20 @@ impl Handler {
     }
 }
 
+#[tarpc::server]
 impl Vaccel for Handler {
-    type RegisterResourceFut = Ready<u64>;
-    fn register_resource(self, _: Context, resource: Resource) -> Self::RegisterResourceFut {
+    async fn register_resource(self, _: Context, resource: Resource) -> u64 {
         let id = self.0.resource_id.fetch_add(1, Ordering::SeqCst);
         self.0.resources.insert(id, Arc::new(resource));
-        future::ready(id)
+        id
     }
 
-    type LengthFut = Ready<usize>;
     /// Example implementation of an operation. This is where the code would call into library code
     /// like tensorflow etc to do the actual work.
-    fn length(self, _: Context, data: ResourceRef<String>) -> Self::LengthFut {
+    async fn length(self, _: Context, data: ResourceRef<String>) -> usize {
         // TODO: this is ugly, lift this logic in get_resource and make that return an Option<&T>
         let resource = self.get_resource(&data).unwrap();
         let data: &String = (&*resource).try_into().unwrap();
-
-        future::ready(data.len())
+        data.len()
     }
 }
