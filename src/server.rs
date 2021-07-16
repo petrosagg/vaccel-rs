@@ -16,19 +16,19 @@ pub trait Vaccel {
     async fn length(data: ResourceRef<String>) -> usize;
 }
 
-/// An RPC request handler that is created for every RPC request that comes in.
-/// It holds a reference counted Server in order to interact with the registered resources
+/// An RPC request Server that is created for every RPC request that comes in.
+/// It holds a reference counted ServerState in order to interact with the registered resources
 #[derive(Default, Clone)]
-pub struct Handler(Arc<Server>);
+pub struct Server(Arc<ServerState>);
 
 /// A Vaccel server
 #[derive(Default)]
-pub struct Server {
+pub struct ServerState {
     resource_id: AtomicU64,
     resources: DashMap<u64, Arc<Resource>>,
 }
 
-impl Handler {
+impl Server {
     /// Used by operation implementations to resolve resource references into actual resources that
     /// they can use. Since resources can be used concurrently by many requests only shared
     /// references are even given
@@ -41,7 +41,7 @@ impl Handler {
 }
 
 #[tarpc::server]
-impl Vaccel for Handler {
+impl Vaccel for Server {
     async fn register_resource(self, _: Context, resource: Resource) -> u64 {
         let id = self.0.resource_id.fetch_add(1, Ordering::SeqCst);
         self.0.resources.insert(id, Arc::new(resource));
